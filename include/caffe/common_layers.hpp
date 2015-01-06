@@ -413,6 +413,39 @@ class CuDNNSoftmaxLayer : public SoftmaxLayer<Dtype> {
 #endif
 
 /**
+ * @brief Normalizes activations.
+ */
+template <typename Dtype>
+class NormalizeLayer : public Layer<Dtype> {
+ public:
+  explicit NormalizeLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_NORMALIZE;
+  }
+  virtual inline int ExactNumBottomBlobs() const { return 1; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+     const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
+
+  /// sum_multiplier is used to carry out sum using BLAS
+  Blob<Dtype> sum_multiplier_;
+  /// scale is an intermediate Blob to hold temporary results.
+  Blob<Dtype> scale_;
+};
+
+/**
  * @brief Creates a "split" path in the network by copying the bottom Blob
  *        into multiple top Blob%s to be used by multiple consuming layers.
  *

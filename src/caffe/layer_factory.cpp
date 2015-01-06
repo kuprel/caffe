@@ -243,6 +243,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new SliceLayer<Dtype>(param);
   case LayerParameter_LayerType_SOFTMAX:
     return GetSoftmaxLayer<Dtype>(name, param);
+  case LayerParameter_LayerType_NORMALIZE:
+    return new NormalizeLayer<Dtype>(param);
   case LayerParameter_LayerType_SOFTMAX_LOSS:
     return new SoftmaxWithLossLayer<Dtype>(param);
   case LayerParameter_LayerType_SPLIT:
