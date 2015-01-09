@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "caffe/layer.hpp"
+#include "caffe/util/math_functions.hpp"
 #include "caffe/vision_layers.hpp"
 
 namespace caffe {
@@ -13,7 +14,7 @@ void SquareLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   Dtype* top_data = (*top)[0]->mutable_cpu_data();
   const int count = bottom[0]->count();
   for (int i = 0; i < count; ++i) {
-    top_data[i] = std::max(bottom_data[i], Dtype(0));
+    top_data[i] = bottom_data[i] * bottom_data[i];
   }
 }
 
@@ -27,7 +28,7 @@ void SquareLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     Dtype* bottom_diff = (*bottom)[0]->mutable_cpu_diff();
     const int count = (*bottom)[0]->count();
     for (int i = 0; i < count; ++i) {
-      bottom_diff[i] = top_diff[i] * (bottom_data[i] > 0);
+      bottom_diff[i] = 2 * bottom_data[i] * top_diff[i];
     }
   }
 }
