@@ -318,7 +318,6 @@ message LayerParameter {
   optional PoolingParameter pooling_param = 19;
   optional PowerParameter power_param = 21;
   optional ReLUParameter relu_param = 30;
-  optional SquareParameter square_param = 41;
   optional SigmoidParameter sigmoid_param = 38;
   optional SoftmaxParameter softmax_param = 39;
   optional SliceParameter slice_param = 31;
@@ -617,17 +616,6 @@ message ReLUParameter {
   // Maas, A. L., Hannun, A. Y., & Ng, A. Y. (2013). Rectifier nonlinearities
   // improve neural network acoustic models. In ICML Workshop on Deep Learning
   // for Audio, Speech, and Language Processing.
-  optional float negative_slope = 1 [default = 0];
-  enum Engine {
-    DEFAULT = 0;
-    CAFFE = 1;
-    CUDNN = 2;
-  }
-  optional Engine engine = 2 [default = DEFAULT];
-}
-
-// Message that stores parameters used by SquareLayer
-message SquareParameter {
   optional float negative_slope = 1 [default = 0];
   enum Engine {
     DEFAULT = 0;
