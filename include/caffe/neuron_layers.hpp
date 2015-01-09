@@ -385,6 +385,27 @@ class CuDNNReLULayer : public ReLULayer<Dtype> {
 };
 #endif
 
+template <typename Dtype>
+class SquareLayer : public NeuronLayer<Dtype> {
+ public:
+  explicit SquareLayer(const LayerParameter& param)
+      : NeuronLayer<Dtype>(param) {}
+
+  virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_SQUARE;
+  }
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
+};
+
 /**
  * @brief Sigmoid function non-linearity @f$
  *         y = (1 + \exp(-x))^{-1}
