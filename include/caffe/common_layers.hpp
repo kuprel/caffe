@@ -413,7 +413,7 @@ class CuDNNSoftmaxLayer : public SoftmaxLayer<Dtype> {
 #endif
 
 /**
- * @brief Normalizes activations.
+ * @brief Normalizes input.
  */
 template <typename Dtype>
 class NormalizeLayer : public Layer<Dtype> {
@@ -439,10 +439,7 @@ class NormalizeLayer : public Layer<Dtype> {
   virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
      const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom);
 
-  /// sum_multiplier is used to carry out sum using BLAS
-  Blob<Dtype> sum_multiplier_;
-  /// scale is an intermediate Blob to hold temporary results.
-  Blob<Dtype> scale_;
+  Blob<Dtype> sum_multiplier_, norm_, squared_;
 };
 
 /**

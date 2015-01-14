@@ -19,9 +19,8 @@ class NormalizeLayerTest : public MultiDeviceTest<TypeParam> {
   typedef typename TypeParam::Dtype Dtype;
  protected:
   NormalizeLayerTest()
-      : blob_bottom_(new Blob<Dtype>(2, 10, 2, 3)),
+      : blob_bottom_(new Blob<Dtype>(10, 4, 2, 3)),
         blob_top_(new Blob<Dtype>()) {
-    // fill the values
     FillerParameter filler_param;
     GaussianFiller<Dtype> filler(filler_param);
     filler.Fill(this->blob_bottom_);
@@ -39,32 +38,31 @@ TYPED_TEST_CASE(NormalizeLayerTest, TestDtypesAndDevices);
 
 TYPED_TEST(NormalizeLayerTest, TestForward) {
   typedef typename TypeParam::Dtype Dtype;
+  double precision = 1e-5;
   LayerParameter layer_param;
   NormalizeLayer<Dtype> layer(layer_param);
   layer.SetUp(this->blob_bottom_vec_, &(this->blob_top_vec_));
   layer.Forward(this->blob_bottom_vec_, &(this->blob_top_vec_));
-  // Test sum
-  for (int i = 0; i < this->blob_bottom_->num(); ++i) {
-    for (int k = 0; k < this->blob_bottom_->height(); ++k) {
-      for (int l = 0; l < this->blob_bottom_->width(); ++l) {
-        Dtype sum = 0;
-        for (int j = 0; j < this->blob_top_->channels(); ++j) {
-          sum += this->blob_top_->data_at(i, j, k, l);
+  for (int i1 = 0; i1 < this->blob_bottom_->num(); ++i1) {
+    Dtype normsqr_bottom = 0;
+    Dtype normsqr_top = 0;
+    for (int i2 = 0; i2 < this->blob_top_->channels(); ++i2) {
+      for (int i3 = 0; i3 < this->blob_top_->height(); ++i3) {
+        for (int i4 = 0; i4 < this->blob_top_->width(); ++i4) {
+          normsqr_top += pow(this->blob_top_->data_at(i1,i2,i3,i4), 2);
+          normsqr_bottom += pow(this->blob_bottom_->data_at(i1,i2,i3,i4), 2);
         }
-        EXPECT_GE(sum, 0.999);
-        EXPECT_LE(sum, 1.001);
-        // Test exact values
-        Dtype scale = 0;
-        for (int j = 0; j < this->blob_bottom_->channels(); ++j) {
-          scale += exp(this->blob_bottom_->data_at(i, j, k, l));
-        }
-        for (int j = 0; j < this->blob_bottom_->channels(); ++j) {
-          EXPECT_GE(this->blob_top_->data_at(i, j, k, l) + 1e-4,
-              exp(this->blob_bottom_->data_at(i, j, k, l)) / scale)
-              << "debug: " << i << " " << j;
-          EXPECT_LE(this->blob_top_->data_at(i, j, k, l) - 1e-4,
-              exp(this->blob_bottom_->data_at(i, j, k, l)) / scale)
-              << "debug: " << i << " " << j;
+      }
+    }
+    EXPECT_NEAR(normsqr_top, 1, precision);
+    Dtype c = pow(normsqr_bottom, -0.5);
+    for (int i2 = 0; i2 < this->blob_top_->channels(); ++i2) {
+      for (int i3 = 0; i3 < this->blob_top_->height(); ++i3) {
+        for (int i4 = 0; i4 < this->blob_top_->width(); ++i4) {
+          EXPECT_NEAR(
+            this->blob_top_->data_at(i1,i2,i3,i4), 
+            this->blob_bottom_->data_at(i1,i2,i3,i4)*c, 
+            precision);
         }
       }
     }
