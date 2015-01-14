@@ -11,34 +11,6 @@
 namespace caffe {
 
 template <typename Dtype>
-__global__ void kernel_channel_subtract(const int num, const int channels,
-    const int spatial_dim, Dtype* data, const Dtype* channel_max) {
-  CUDA_KERNEL_LOOP(index, num * spatial_dim) {
-    int n = index / spatial_dim;
-    int s = index % spatial_dim;
-    for (int c = 0; c < channels; ++c) {
-      data[(n * channels + c) * spatial_dim + s] -= channel_max[index];
-    }
-  }
-}
-
-template <typename Dtype>
-__global__ void kernel_channel_dot(const int num, const int channels,
-    const int spatial_dim, const Dtype* data_1, const Dtype* data_2,
-    Dtype* channel_dot) {
-  CUDA_KERNEL_LOOP(index, num * spatial_dim) {
-    int n = index / spatial_dim;
-    int s = index % spatial_dim;
-    Dtype dot = 0;
-    for (int c = 0; c < channels; ++c) {
-      dot += (data_1[(n * channels + c) * spatial_dim + s]
-          * data_2[(n * channels + c) * spatial_dim + s]);
-    }
-    channel_dot[index] = dot;
-  }
-}
-
-template <typename Dtype>
 void NormalizeLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
   const Dtype* bottom_data = bottom[0]->gpu_data();
