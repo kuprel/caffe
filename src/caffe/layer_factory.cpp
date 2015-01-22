@@ -183,6 +183,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new AccuracyLayer<Dtype>(param);
   case LayerParameter_LayerType_ABSVAL:
     return new AbsValLayer<Dtype>(param);
+  case LayerParameter_LayerType_ANGLE_LOSS:
+    return new AngleLossLayer<Dtype>(param);
   case LayerParameter_LayerType_ARGMAX:
     return new ArgMaxLayer<Dtype>(param);
   case LayerParameter_LayerType_BNLL:
@@ -227,6 +229,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new MVNLayer<Dtype>(param);
   case LayerParameter_LayerType_MULTINOMIAL_LOGISTIC_LOSS:
     return new MultinomialLogisticLossLayer<Dtype>(param);
+  case LayerParameter_LayerType_NORMALIZE:
+    return new NormalizeLayer<Dtype>(param);
   case LayerParameter_LayerType_POOLING:
     return GetPoolingLayer<Dtype>(name, param);
   case LayerParameter_LayerType_POWER:
@@ -243,8 +247,6 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new SliceLayer<Dtype>(param);
   case LayerParameter_LayerType_SOFTMAX:
     return GetSoftmaxLayer<Dtype>(name, param);
-  case LayerParameter_LayerType_NORMALIZE:
-    return new NormalizeLayer<Dtype>(param);
   case LayerParameter_LayerType_SOFTMAX_LOSS:
     return new SoftmaxWithLossLayer<Dtype>(param);
   case LayerParameter_LayerType_SPLIT:

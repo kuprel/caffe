@@ -50,7 +50,6 @@ class SoftmaxWithLossLayerTest : public MultiDeviceTest<TypeParam> {
 
 TYPED_TEST_CASE(SoftmaxWithLossLayerTest, TestDtypesAndDevices);
 
-
 TYPED_TEST(SoftmaxWithLossLayerTest, TestGradient) {
   typedef typename TypeParam::Dtype Dtype;
   LayerParameter layer_param;

@@ -216,6 +216,16 @@ void caffe_abs<double>(const int n, const double* a, double* y) {
     vdAbs(n, a, y);
 }
 
+template <>
+void caffe_acos<float>(const int n, const float* a, float* y) {
+    vsAcos(n, a, y);
+}
+
+template <>
+void caffe_acos<double>(const int n, const double* a, double* y) {
+    vdAcos(n, a, y);
+}
+
 unsigned int caffe_rng_rand() {
   return (*caffe_rng())();
 }
