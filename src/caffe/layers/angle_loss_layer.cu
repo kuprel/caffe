@@ -1,4 +1,5 @@
 #include <vector>
+#include <math.h>
 
 #include "caffe/layer.hpp"
 #include "caffe/util/io.hpp"
@@ -10,13 +11,18 @@ namespace caffe {
 template <typename Dtype>
 void AngleLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
-  // caffe_gpu_dot(
-  //   bottom[0]->count(), 
-  //   bottom[0]->gpu_data(), 
-  //   bottom[1]->gpu_data(),
-  //   (*top)[0]->mutable_gpu_data()
-  // );
-  // (*top)[0]->mutable_gpu_data()[0] /= bottom[0]->num();
+  // int n = bottom[0]->num();
+  // int d = bottom[0]->count()/n;
+  // const Dtype *u, *v;
+  // Dtype *t = (*top)[0]->mutable_gpu_data();
+  // Dtype L = 0;
+  // for (int i=0; i<n; ++i) {
+  //   u = bottom[0]->gpu_data() + i*d;
+  //   v = bottom[1]->gpu_data() + i*d;
+  //   caffe_gpu_dot(d, u, v, &L);
+  //   L = acos(L);
+  // }
+  // *t = L/n;
   Forward_cpu(bottom, top);
 }
 

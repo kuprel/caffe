@@ -55,15 +55,17 @@ class AngleLossLayerTest : public MultiDeviceTest<TypeParam> {
 
 TYPED_TEST_CASE(AngleLossLayerTest, TestDtypesAndDevices);
 
+TYPED_TEST(AngleLossLayerTest, TestArcCos) {
+  typedef typename TypeParam::Dtype Dtype;
+  EXPECT_NEAR(acos(0.5), 3.14159/3, 1e-3);
+}
+
 TYPED_TEST(AngleLossLayerTest, TestForward) {
   typedef typename TypeParam::Dtype Dtype;
-  double precision = 1e-5;
-
   LayerParameter layer_param;
   AngleLossLayer<Dtype> layer(layer_param);
   layer.SetUp(this->UV, &(this->T));
   layer.Forward(this->UV, &(this->T));
-
   Dtype L1 = 0;
   int n = this->x->num();
   int d = this->x->channels();
@@ -78,7 +80,7 @@ TYPED_TEST(AngleLossLayerTest, TestForward) {
   }
   L1 /= n;
   Dtype L2 = this->t->data_at(0,0,0,0);
-  EXPECT_NEAR(L1, L2, precision);
+  EXPECT_NEAR(L1, L2, 1e-5);
 }
 
 TYPED_TEST(AngleLossLayerTest, TestGradient) {

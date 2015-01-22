@@ -24,11 +24,14 @@ void AngleLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   int d = bottom[0]->count()/n;
   const Dtype *u, *v;
   Dtype *t = (*top)[0]->mutable_cpu_data();
-  Dtype L = 0;
+  Dtype L = 0, dot;
   for (int i=0; i<n; ++i) {
     u = bottom[0]->cpu_data() + i*d;
     v = bottom[1]->cpu_data() + i*d;
-    L += acos(caffe_cpu_dot(d, u, v));
+    dot = caffe_cpu_dot(d, u, v);
+    dot = std::max(Dtype(-1),dot);
+    dot = std::min(Dtype(1),dot);
+    L += acos(dot);
   }
   *t = L/n;
 }
