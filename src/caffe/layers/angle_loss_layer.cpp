@@ -18,6 +18,16 @@ void AngleLossLayer<Dtype>::Reshape(
 }
 
 template <typename Dtype>
+Dtype ThreshDot_cpu(const int d, const Dtype * u, 
+    const Dtype * v) {
+  Dtype dot = caffe_cpu_dot(d, u, v);
+  Dtype eps = 1e-4;
+  dot = std::max(Dtype(-1)+eps,dot);
+  dot = std::min(Dtype(1)-eps,dot);
+  return dot;
+}
+
+template <typename Dtype>
 void AngleLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     vector<Blob<Dtype>*>* top) {
   int n = bottom[0]->num();
@@ -28,10 +38,7 @@ void AngleLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   for (int i=0; i<n; ++i) {
     u = bottom[0]->cpu_data() + i*d;
     v = bottom[1]->cpu_data() + i*d;
-    dot = caffe_cpu_dot(d, u, v);
-    dot = std::max(Dtype(-1),dot);
-    dot = std::min(Dtype(1),dot);
-    L += acos(dot);
+    L += acos(ThreshDot_cpu(d,u,v));
   }
   *t = L/n;
 }
@@ -50,7 +57,7 @@ void AngleLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         Dtype* db = (*bottom)[l]->mutable_cpu_diff() + i*d;
         u = (*bottom)[l]->cpu_data() + i*d;
         v = (*bottom)[1-l]->cpu_data() + i*d;
-        a = -dt*pow(1-pow(caffe_cpu_dot(d,u,v),2),-0.5)/n;
+        a = -dt*pow(1-pow(ThreshDot_cpu(d,u,v),2),-0.5)/n;
         caffe_cpu_scale(d, a, v, db);
       }
     }
